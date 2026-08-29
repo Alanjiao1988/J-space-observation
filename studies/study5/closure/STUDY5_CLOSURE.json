@@ -1,0 +1,158 @@
+{
+ "schema_version": "study5-closure-v1",
+ "document_kind": "terminal closure record for the J-lens route",
+ "study_id": "STUDY5",
+ "recorded_at_utc": "2026-08-29T05:35:00Z",
+ "recorded_by": "adjudicator ruling, in session, 2026-08-29",
+ "computation_performed": "none; every number is read from artifacts already committed",
+ "measurement_run": false,
+ "lens_read": false,
+ "gpu_used": false,
+
+ "what_is_terminated": [
+  "the estimand search",
+  "this measurement route",
+  "the J-lens instrument line"
+ ],
+ "why": "the registration closed the door, and what continuing would require is a NEW STUDY; combined with the time constraint, that study is outside this authorisation",
+
+ "this_is_not_UNDERPOWERED": {
+  "value": true,
+  "why": "the MDE was never computed, because the power of an eliminated estimand is not a meaningful quantity",
+  "the_executing_session_reached_this_independently": true,
+  "confirmed_by_the_adjudicator": true
+ },
+
+ "the_conclusion_verbatim": "This project never tested its hypothesis. All six phases failed at the level of the MEASUREMENT APPARATUS, and none at the level of the hypothesis. Every failure was constructional, demonstrated and reproducible, not a case of having looked and seen nothing. Therefore: IT MUST NOT BE CLAIMED THAT J-SPACE EXISTS OR DOES NOT EXIST. This project supplies no evidence on that question, in either direction.",
+
+ "failure_map": [
+  {
+   "phase": "EQ1",
+   "determination": "Q-4a FAIL",
+   "layer_that_failed": "convention choice, the V axis",
+   "proof": "an explanatory annotation, not a retraction; the V and D axes point at opposite ends of the network, Jaccard 0.0000"
+  },
+  {
+   "phase": "EQ2",
+   "determination": "NEGATIVE, D-1 negative-A",
+   "layer_that_failed": "instrument: J approaches a scaled identity",
+   "proof": "identity energy share 0.749 at layer 26, best-scaling alpha approximately 1.0 over layers 23 to 26; condition (ii) collapsed the band to length 1; settled by R-0's pre-registered arithmetic"
+  },
+  {
+   "phase": "P-0",
+   "determination": "UNINTERPRETABLE",
+   "layer_that_failed": "the batch baseline AND the estimand",
+   "proof": "a no-op guaranteed by the architecture returned 0.013754; the withheld verdict's direction is recorded so any later estimand replacement can be seen to move toward one side"
+  },
+  {
+   "phase": "P-0prime",
+   "determination": "halted",
+   "layer_that_failed": "the estimand family, proven dead",
+   "proof": "the prescribed replacement was algebraically identical to P-0's own estimand, 177944 committed values at 0.000e+00; a 20000-draw clean-run sweep gave fraction at or below zero of 0.0000; n equals 18 ended that frame independently"
+  },
+  {
+   "phase": "P-0c",
+   "determination": "OBJECT_NOT_ESTABLISHED",
+   "layer_that_failed": "object accuracy",
+   "proof": "0.7562 against a floor of 0.80; the threshold was not moved and the object was not rebuilt"
+  },
+  {
+   "phase": "P-0c-2",
+   "determination": "object ESTABLISHED; shortlist exhausted",
+   "layer_that_failed": "the estimand class AS DECLARED",
+   "proof": "object at 0.8406 accuracy, 0.1062 ablated, 0.7344 drop, 112 correct-both units; C1 failed 4 of 5 OD-011 rev-2 pipeline cases"
+  }
+ ],
+ "six_phases_six_failures_all_in_the_apparatus": true,
+
+ "no_fifth_candidate": {
+  "this_is_registered_arithmetic_not_a_judgement": true,
+  "the_three_registered_grounds": [
+   "the measurement pre-registration's stop condition 3: continuing would require adding a candidate, therefore stop",
+   "the prior directive: if zero candidates survive, stop and report, and add no candidate",
+   "the estimand line's one-revision allowance was spent on P-0prime; this shortlist IS that revision's product, so a fifth candidate is a SECOND revision"
+  ],
+  "verbatim": "A fifth candidate would necessarily be designed AFTER seeing four failures, to evade those four failures. Each failure was hit by its own pre-declared risk, which proves the pre-declaration was genuine, but it does not make a fifth candidate clean, because it would be designed under knowledge of WHICH RISKS ACTUALLY BITE.\n\nMore fundamentally: if a stop condition written in advance is overturned here, then every earlier refusal is retroactively void. THE VALUE OF THIS ENTIRE RECORD RESTS ON THIS PARTICULAR REFUSAL HOLDING."
+ },
+
+ "the_no_op_requirement_is_coherent": {
+  "verbatim": "C1 subtracts the same destruction term from every patch, including patches where no destruction occurred. For a no-op it degenerates to baseline minus null_mean, measured at -0.506888, consistent with the destruction mean of 0.4997 the sweep had already computed.\n\nTHE DEFECT IS NOT SUBTRACTION. IT IS SUBTRACTING A CONSTANT THAT DOES NOT MATCH. The amount of destruction is a NUISANCE PARAMETER THAT VARIES WITH THE PATCH: zero for a no-op, some unknown intermediate value for a real donor patch, largest for a random vector. A fixed additive correction cannot track a varying quantity. Requiring a no-op to return zero is exactly the test that forces this defect into view, and it is not an unfair demand on a subtraction-based estimand.",
+
+  "precision_constraint_1_the_decisive_defect": {
+   "what_is_decisive": "the no-op bias at 13.1 times the largest real signal",
+   "what_is_NOT_decisive": "the ordering violation",
+   "the_numbers": {
+    "attenuated_transfer": 0.043370,
+    "full_donor": 0.038606,
+    "difference": 0.004764
+   },
+   "ruling": "at that noise scale a violation of monotonicity is NOT statistically established",
+   "how_it_must_be_written": "the monotonicity that rev 2 requires was not established",
+   "how_it_must_NOT_be_written": "non-monotonicity was established"
+  },
+
+  "precision_constraint_2_the_escape_route_is_also_closed": {
+   "the_escape_being_closed": "subtract the constant bias and C1 is rescued",
+   "why_it_fails": "the full-donor signal is itself only 0.038606 against a bias of 0.507; after re-centring the signal-to-noise ratio still does not hold. And rev 2 requires monotonicity to be ESTABLISHED, which it was not",
+   "why_it_is_written_down": "so that a successor does not walk the same path"
+  }
+ },
+
+ "methodological_output": [
+  "the directionality rule: implementation toward registration is a bug fix, registration toward data is p-hacking; the boundary is the direction, not the outcome",
+  "post-hoc tightening versus loosening",
+  "asymmetric-motivation disclosure",
+  "OD-011 rev 2: a non-vacuity demonstration must include a must-return-positive case",
+  "OD-017: a diff of registered text against implementation, comparing live imported values",
+  "OD-021: a criterion issued by the adjudicator is not exempt from verification",
+  "OD-022: the clean-run destruction sweep, a zero-GPU precondition gate",
+  "push the rule before computing the number",
+  "commit failed repairs, do not discard them",
+  "the sweep and rev 2 are complementary at the two ends of the nuisance parameter"
+ ],
+
+ "limitations_verbatim": {
+  "no_passing_positive_control_on_the_jlens_line": "this study never obtained one; the negative conclusions are strong about OUR EXECUTION and weak about THE METHOD ITSELF",
+  "bfloat16": "reduction order produces a batch-width-dependent offset on the order of 0.476 and 0.110937 logits, the same order as the effects under measurement; ANY bf16 patching result that has not demonstrated bit-exact no-ops is uninterpretable",
+  "the_constructed_object": "a SELECTION SET; success on it is not success on real items",
+  "hop_2_never_fails": "behavioural evidence, NOT an internal intermediate representation",
+  "hop_1_retrieval_decay": "not a finding of this project"
+ },
+
+ "accounting": {
+  "cumulative_actively_used_gpu_hours": 40.144672,
+  "original_registered_ceiling": 240,
+  "per_phase": {
+   "EQ1": 31.582505,
+   "EQ2": 7.483333,
+   "P-0": 0.106056,
+   "P-0prime": 0.341667,
+   "P-0c": 0.129167,
+   "P-0c-2": 0.501944
+  },
+  "gates_reduced_to_save_time_or_hours": 0,
+  "azure_configuration_changes": 0,
+  "blobs_written": 0,
+  "target_touched": false,
+  "sealed_lenses_read": false
+ },
+
+ "must_not_be_claimed": [
+  "that J-space exists or does not exist",
+  "that the paper is wrong; it measured Sonnet 4.5",
+  "that the published lenses are defective",
+  "anything about how T would behave, T having never been measured",
+  "the existence of internal causal reasoning machinery",
+  "any training-causal effect of distillation",
+  "that attention, embeddings, normalisation or whole-model differences have been explained",
+  "that the paper's mid-depth band has been reproduced",
+  "anything about consciousness",
+  "that 'the question remains open' is this project's conclusion; the correct statement is that THIS PROJECT FAILED TO TEST THE QUESTION",
+  "that any result on the constructed object is a result on real items",
+  "P-0's withheld verdict as a published conclusion",
+  "the handoff's post-hoc diagnosis as a methodological contribution or a validated solution",
+  "that shortlist exhaustion refutes a CLASS of estimand; what was exhausted is a CLOSED LIST"
+ ],
+
+ "claim_ceiling": "A closure record. It licenses no claim of any kind, and nothing in it is a scientific finding."
+}
