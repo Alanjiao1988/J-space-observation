@@ -14,13 +14,23 @@ ROOT = pathlib.Path(
 # commits were written ON that branch, so at the moment the table was produced
 # the namespace was still being written and had no sealing commit to name.
 #
-# The first attempt to seal it here repeated that mistake in miniature. It was
-# pinned at 5aefdf4, the commit that declared the terminal state, but the closing
-# verification then wrote to the namespace's own STATUS.json and journal, so the
-# tree no longer matched and the check correctly reported CHANGED. The seal is
-# therefore taken at e72e024, the commit at which p0c2 actually stopped moving.
-# The lesson is the same one that produced the original omission: a namespace
-# cannot be sealed while the phase writing it is still running.
+# Two attempts to seal it here failed, and the second failure exposed the real
+# cause rather than a slip.
+#
+#   attempt 1, pinned at 5aefdf4: the closing verification then wrote to the
+#   namespace's own STATUS.json and journal, so the tree moved.
+#
+#   attempt 2, pinned at e72e024: recording THAT seal wrote to STATUS.json
+#   again, so the tree moved again.
+#
+# The cause is that the seal record lived INSIDE the namespace it sealed. That is
+# self-referential and cannot converge: writing the hash changes the object the
+# hash describes. The fix is structural, not another retry - THE SEAL RECORD
+# LIVES HERE, IN closure/, OUTSIDE EVERY NAMESPACE IT DESCRIBES, and nothing is
+# written back into validation-p0c2. It is sealed at 099486f, its last write.
+#
+# The lesson generalises to the original omission: a namespace cannot be sealed
+# from within itself, nor while the phase writing it is still running.
 SEALED = [
     ("studies/study5/qualification-eq1", "a28ae6a"),
     ("studies/study5/qualification-eq2", "a28ae6a"),
@@ -28,7 +38,7 @@ SEALED = [
     ("studies/study5/validation-p0", "9556c40"),
     ("studies/study5/validation-p0-prime", "e948134"),
     ("studies/study5/validation-p0c", "f88b2a6"),
-    ("studies/study5/validation-p0c2", "e72e024"),
+    ("studies/study5/validation-p0c2", "099486f"),
 ]
 
 
