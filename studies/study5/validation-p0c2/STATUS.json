@@ -3,12 +3,12 @@
  "study_id": "STUDY5_P0C2",
  "namespace": "studies/study5/validation-p0c2/",
  "kind": "constructed-object rebuild, instrument validation",
- "lifecycle_state": "STUDY5_P0C2_MEASUREMENT_HALTED_SHORTLIST_EXHAUSTED",
- "terminal": false,
- "resumable": true,
+ "lifecycle_state": "STUDY5_JLENS_ROUTE_TERMINATED_AND_CLOSED",
+ "terminal": true,
+ "resumable": false,
  "is_a_scientific_result": false,
- "current_phase": "P-0c-2",
- "next_phase": "estimand selection on the established object, then application to the real item set",
+ "current_phase": "closed",
+ "next_phase": "none; any successor requires a new independent pre-registration",
  "determination": "OBJECT_ESTABLISHED",
  "determination_produced_by": "the registered criterion, applied unmodified, reading its thresholds from the pushed registration",
  "predecessors": {
@@ -215,5 +215,23 @@
   "surviving_candidates": 0,
   "candidates_added": 0,
   "determination_is_UNDERPOWERED": false
+ },
+ "lifecycle_state_is_registered_terminal": true,
+ "closure": {
+  "closure_md_sha256": "c1c281fc220b4f32a7a2230f9f643117366da67babd577fa36bca2647f0a1954",
+  "closure_json_sha256": "b042f265986a66b6bc6b4d904f4c6d26bc89eede4e91a5a873ada3137ac78b82",
+  "handoff_md_sha256": "db3abbcb0852e9b51aff442406f9de4db6145962fc044d09967b0462af362635",
+  "handoff_json_sha256": "0a5baaeda8436d468a87b569301d62fccfc9b559acd8847aa7470783c5fd274a",
+  "terminated": [
+   "the estimand search",
+   "this measurement route",
+   "the J-lens instrument line"
+  ],
+  "is_underpowered": false,
+  "why_not_underpowered": "the MDE was never computed; the power of an eliminated estimand is not a meaningful quantity",
+  "fifth_candidate_declared": false,
+  "cumulative_gpu_hours": 40.144672,
+  "predecessor_namespaces_verified_byte_identical": 6,
+  "files_verified": 375
  }
 }
