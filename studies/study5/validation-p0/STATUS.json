@@ -3,12 +3,14 @@
  "study_id": "STUDY5_P0",
  "namespace": "studies/study5/validation-p0/",
  "kind": "item-validity verification",
- "lifecycle_state": "STUDY5_P0_PREREGISTERED_AWAITING_MEASUREMENT",
+ "lifecycle_state": "STUDY5_P0_HALTED_AT_A_REGISTERED_STOP_CONDITION_AWAITING_OPERATOR",
  "lifecycle_state_is_registered_terminal": false,
  "terminal": false,
+ "resumable": true,
  "is_a_scientific_result": false,
- "current_phase": "P-0",
- "next_phase": "P-0 measurement, then P-0b only if the verdict is CAUSALLY_USED",
+ "current_phase": "P-0, halted",
+ "next_phase": "none without an operator decision; P-0b is NOT entered",
+ "halted_under": "HB-004",
 
  "authority": {
   "path": "studies/study5/prompts/study5_p0_item_validity_authority.md",
@@ -32,22 +34,57 @@
    "d1_category": "negative-A",
    "sealed": true,
    "reopened_by_this_phase": false,
-   "the_limitation_this_phase_addresses": "EQ2 never obtained a passing positive control, so a failure of the method and a failure of our use of it stayed indistinguishable"
+   "every_eq2_artifact_byte_identical": true,
+   "eq2_mounted_read_only_during_the_measurement": true
   }
  },
 
- "what_this_phase_is_and_is_not": {
-  "is": "a test of whether the multihop items oblige Qwen2.5-7B-Instruct to compute and carry an intermediate at all",
-  "is_not": "a test of the J-lens, of J-space, of the paper, or of T",
-  "why_it_precedes_any_further_instrument_work": "the previous ordering stacked three assumptions - item validity, then the model exhibiting the phenomenon, then the instrument - so a collapse at any level presented identically as instrument failure"
+ "gates": {
+  "OD-011_non_vacuity": "PASS, 4 of 4, proven on synthetic curves before any measurement existed",
+  "OD-017_conformance": "PASS, 23 entries, 0 divergences",
+  "sealed_asset_guard": "PASS, 0 lens reads, 0 references to T, 0 imports of the instrument under test",
+  "harness_positive_control": "PASS, 0.9862 with lcb 0.9523 against a required 0.90",
+  "prefix_integrity": "FAIL, 0.025512 against a tolerance of 0.0001"
  },
 
- "gates": {
-  "OD-011_non_vacuity": "PASS, 4 of 4 cases, proven on synthetic curves before any measurement existed",
-  "OD-017_conformance": "PASS, 20 entries, 0 divergences",
-  "sealed_asset_guard": "NOT YET RUN",
-  "harness_positive_control": "NOT YET EVALUATED",
-  "prefix_integrity": "NOT YET EVALUATED"
+ "measurement": {
+  "model": "Qwen2.5-7B-Instruct, 28 transformer layers, the EQ2 positive control",
+  "eval_set": "the pre-existing multihop set; no item was authored",
+  "frame_is_exhaustive": true,
+  "ordered_units": 190,
+  "units_measured": 184,
+  "units_dropped_on_the_registered_denominator_guard": 6,
+  "clusters": 92,
+  "depth_grid": "embedding output plus 28 block outputs",
+  "sites": ["PREFIX", "CUE", "BRIDGE", "READOUT"],
+  "null_constructions": ["PREFIX no-op", "unrelated third donor", "norm-matched random"],
+  "replicates_per_null": 5,
+  "instrument_under_test_imported": false
+ },
+
+ "outcome": {
+  "the_registered_rule_ran_unmodified": true,
+  "it_returned": "NOT_CAUSALLY_USED",
+  "the_verdict_is_reportable": false,
+  "why_not": "the registration states a verdict means nothing until the structural gates pass, and the PREFIX integrity gate did not pass",
+  "ceiling": 1.0029503,
+  "ceiling_source": {"construction": "NULL_R_2", "site": "READOUT", "layer": 19},
+  "bridge_peak_mean": 0.238015,
+  "bridge_peak_layer": 22,
+  "criterion_revisions_made": 0,
+  "verdict_recomputations_under_any_alternative_rule": 0
+ },
+
+ "two_defects_found": {
+  "implementation": "the clean baseline was measured in a batch-of-one forward and every patched value in a batch-of-48 forward, putting a constant offset of about 0.0138 into every restoration value. The PREFIX gate caught it, which is the part of the design that worked as intended",
+  "registration": "the estimand cannot separate movement toward the donor's answer from generic disruption of the recipient's, and the single global ceiling imports the READOUT scale into a BRIDGE test. Both are mine",
+  "neither_is_repaired_here": "repairing either after seeing the curve would move the registered text toward the data"
+ },
+
+ "reported_only": {
+  "item_accuracy_donor": 0.3261,
+  "item_accuracy_recipient": 0.3261,
+  "note": "the model produces the labelled target as its top-1 for about a third of the admissible multihop items; EQ2 never established this number. No criterion was adjusted from it"
  },
 
  "standing_rules_inherited_and_in_force": [
@@ -56,13 +93,18 @@
   "OD-013 one variable at a time",
   "OD-017 registered text versus implementation conformance, compared on live values"
  ],
+ "rules_proposed_but_not_in_force": ["OD-018", "OD-019", "OD-020"],
 
  "budget": {
   "registered_total_ceiling_gpu_hours": 240,
   "cumulative_before_this_phase": 39.065839,
+  "consumed_this_phase": 0.106056,
+  "cumulative_after_this_phase": 39.171895,
   "jlens_route_additional_ceiling": 15,
+  "jlens_route_consumed": 0.106056,
+  "jlens_route_remaining": 14.893944,
   "hard_stop_at_cumulative": 54.065839,
-  "consumed_this_phase": 0.0,
+  "hard_stop_reached": false,
   "denominated_per": "OD-001"
  },
 
@@ -74,7 +116,8 @@
   "storage_keys_read": 0,
   "training_group_v100_machines_touched": 0,
   "nsg_rules_added_this_invocation": 0,
-  "cost_reduction_actions_proposed": 0
+  "cost_reduction_actions_proposed": 0,
+  "blobs_written": 0
  },
 
  "protected_objects": {
@@ -84,10 +127,11 @@
   "eq2_artifacts_modified": 0
  },
 
- "independence_from_the_instrument_under_test": {
-  "any_p0_tool_imports_jlens": false,
-  "how_verified": "guard_p0.imports_jlens matches an import statement across every file in tools/, and the measurement additionally records sys.modules membership at the end of each run"
+ "what_this_phase_did_establish": {
+  "one_thing_only": "that the patching harness moves what it claims to move, at 0.9862 with a lower bound of 0.9523",
+  "why_it_is_worth_recording": "no passing positive control had been obtained anywhere in Study 5 before this. It certifies an INSTRUMENT and nothing else",
+  "what_it_does_not_establish": "nothing about whether the model computes an intermediate, nothing about J, nothing about the paper, nothing about T"
  },
 
- "claim_ceiling": "P-0 is item-validity verification. No state it can reach is a scientific result."
+ "claim_ceiling": "P-0 is item-validity verification. No state it can reach is a scientific result, and this state is a halt rather than a determination."
 }

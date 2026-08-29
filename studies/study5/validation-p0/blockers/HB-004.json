@@ -1,0 +1,119 @@
+{
+ "schema_version": "study5-p0-blocker-v1",
+ "blocker_id": "HB-004",
+ "phase": "P-0",
+ "recorded_at_utc": "2026-08-29T00:40:00Z",
+ "status": "TERMINAL FOR THIS INVOCATION, AWAITING OPERATOR",
+ "kind": "registered stop condition reached",
+
+ "which_stop_condition": {
+  "from": "P0_PREREGISTRATION.json section 9",
+  "clauses_triggered": [
+   "a structural gate did not pass",
+   "any situation in which the operator wishes to revise a pre-registered criterion"
+  ],
+  "clauses_not_triggered": [
+   "no OD-011 case failed",
+   "the OD-017 audit found no divergence",
+   "nothing required reading lens_A or lens_B",
+   "nothing touched T",
+   "no EQ1 criterion, estimand, threshold, split or reading was modified",
+   "no upload was attempted, so no If-None-Match precondition could fail",
+   "no reboot, resize, configuration change or NSG rule was needed",
+   "the budget ceiling was not approached"
+  ]
+ },
+
+ "what_happened": {
+  "measurement_completed": true,
+  "units_measured": 184,
+  "units_dropped": 6,
+  "clusters": 92,
+  "the_registered_rule_ran_and_returned": "NOT_CAUSALLY_USED",
+  "the_verdict_is_not_reportable": true,
+  "why_the_verdict_is_not_reportable": "the registration states that a verdict means nothing until the structural gates pass, and the integrity gate did not pass. Reporting it anyway would be helping myself to the half of the registration I happen to like"
+ },
+
+ "gate_1_harness_positive_control": {
+  "verdict": "PASS",
+  "site": "CUE",
+  "layer": -1,
+  "mean": 0.9862462719396212,
+  "lcb": 0.9522598117094258,
+  "required_lcb": 0.9,
+  "significance": "this is the first passing positive control obtained anywhere in Study 5",
+  "strictly_what_it_certifies": "that the patching harness moves what it claims to move",
+  "strictly_what_it_does_not_certify": "anything whatsoever about whether the model computes an intermediate, about J, about the paper, or about T",
+  "two_further_structural_confirmations": {
+   "READOUT_at_the_last_layer": "restoration exactly 1.000000 with a zero-width interval, as it must be: patching the final position's final-block state installs the donor's answer state verbatim",
+   "CUE_at_layer_5": "1.019956, consistent with a full conversion of the run"
+  }
+ },
+
+ "gate_2_prefix_integrity": {
+  "verdict": "FAIL",
+  "max_abs_mean": 0.025511768537630139,
+  "tolerance": 0.0001,
+  "diagnosis": "the offset is in the baseline, not in the patch",
+  "the_observation_that_settles_it": {
+   "statement": "PREFIX at layer 27 is a no-op guaranteed by the architecture rather than merely by causal masking: the last block's output at a non-final position is read by NOTHING, because only the final position reaches the unembedding. It would read zero even if the patched values were arbitrary.",
+   "observed": 0.013753728060378875,
+   "embedding_layer_no_op_observed": 0.013753728060378875,
+   "the_two_agree_unit_by_unit": true,
+   "therefore": "a patch that provably cannot influence the output still moves the metric, so patching is not the source"
+  },
+  "the_actual_cause": "the clean baseline LD is measured in a batch-of-one forward while every patched LD is measured in a batch-of-48 forward; bfloat16 kernels do not select the same reduction order at both batch sizes, so a constant per-unit offset enters every restoration value",
+  "who_is_at_fault": "the implementation, not the registration; the registered tolerance was right to refuse it",
+  "the_fix_not_applied_here": "include an explicit self-patch job in the same batch and use it as the baseline. That is an implementation change in the direction the precedent permits, but it requires re-running the measurement, and the registration says to stop and report rather than self-repair",
+  "estimated_cost_of_the_rerun": "about 0.11 actively used GPU-hours, the same as the run just performed"
+ },
+
+ "the_second_problem_which_is_heavier": {
+  "id": "the estimand does not separate two different movements",
+  "statement": "restoration is normalised on LD = logit(donor target) - logit(recipient target). Any patch that merely DISRUPTS the recipient's own answer lowers logit(recipient target) and therefore raises restoration, without carrying one bit of information about the donor. The registered estimand cannot tell 'moved toward the donor's answer' apart from 'moved away from the recipient's answer'.",
+  "the_evidence_that_this_is_not_hypothetical": {
+   "unrelated_third_donor_at_BRIDGE_worst_mean": 0.1305,
+   "norm_matched_random_vector_at_BRIDGE_worst_mean": 0.4139,
+   "real_construction_at_BRIDGE_peak_mean": 0.238015,
+   "reading": "the null constructions are not quiet. A patch carrying no donor information at all produces movement of the same order as the real patch, which is exactly what the disruption pathway predicts"
+  },
+  "why_this_is_the_EQ2_lesson_recurring": "EQ2 recorded that a null carrying a small real signal produced a band under a rule that assumed the null was empty. Here the nulls were built correctly and the ceiling absorbed the disruption, so the rule did NOT manufacture a positive and the conservative direction held. But the same underlying error is present one level down, in the estimand rather than in the null",
+  "consequence": "the measurement is conservative and underpowered rather than wrong. As specified it cannot distinguish a carried intermediate from generic disruption at the same site",
+  "this_is_a_registration_error_and_it_is_mine": true
+ },
+
+ "the_ceiling_scale_problem": {
+  "registered_rule": "one scalar maximum over every null construction, replicate, site other than PREFIX, and layer",
+  "value_produced": 1.0029503,
+  "source": {"construction": "NULL_R_2", "site": "READOUT", "layer": 19},
+  "worst_null_upper_bound_by_site": {"CUE": 0.9316, "BRIDGE": 0.6354, "READOUT": 1.0029},
+  "why_it_happens": "a norm-matched random vector at the READOUT position destroys the state the answer is read from, and the normalised restoration of a destroyed run is unbounded; the same construction at BRIDGE perturbs a position the answer is not read from. One scalar maximum therefore imports the READOUT scale into a BRIDGE test",
+  "why_the_OD_011_demonstration_did_not_catch_it": "the demonstration used synthetic nulls at sigma 0.05 and 0.15, the scale of an in-distribution null. It proved the rule cannot manufacture a positive from a quiet null, and that remains true. It did not prove the ceiling is on the right scale, and I did not think to require that it should",
+  "not_repaired_here_because": "the BRIDGE curve is already in hand, so choosing a per-site ceiling now would move the registered text toward the data. The directionality precedent calls that p-hacking regardless of whether the replacement rule is better in the abstract"
+ },
+
+ "reported_only_and_never_used_to_adjust_anything": {
+  "item_accuracy": {
+   "donor_top1_equals_donor_target": 0.3261,
+   "recipient_top1_equals_recipient_target": 0.3261,
+   "note": "Qwen2.5-7B-Instruct produces the labelled target as its top-1 continuation for about a third of the admissible multihop items. EQ2 measured lens readability on these items without ever establishing this number",
+   "what_it_does_not_mean": "it is not the verdict, it does not establish that the items are invalid, and no criterion was adjusted from it. It is recorded because it is cheap, it was never checked, and it bears directly on item validity"
+  }
+ },
+
+ "what_must_not_be_read_into_any_of_this": [
+  "no verdict on whether the multihop items force a causally-used intermediate; the gates blocked it",
+  "nothing about J-space, the J-lens, the published lenses, the paper, or T",
+  "nothing about EQ1's Q-4a FAIL, which stands untouched",
+  "nothing about EQ2's NEGATIVE, which stands untouched and is neither confirmed nor weakened by a halted phase"
+ ],
+
+ "decisions_reserved_for_the_operator": [
+  "whether to re-run with the baseline measured inside the patched batch",
+  "whether the estimand should be replaced by one that isolates movement toward the donor from generic disruption",
+  "whether the ceiling should be per-site rather than one global scalar",
+  "whether a null must be shown quiet before it may serve as a ceiling, as a new standing rule"
+ ],
+
+ "claim_ceiling": "A blocker record for a halted phase. It licenses no claim of any kind."
+}

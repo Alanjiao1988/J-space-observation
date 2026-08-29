@@ -1,0 +1,108 @@
+{
+ "schema_version": "study5-p0-resource-accounting-v1",
+ "phase": "P-0",
+ "updated_at_utc": "2026-08-29T00:50:00Z",
+ "invocation_complete": true,
+ "phase_halted_under": "HB-004",
+
+ "budget_measurement_definition": {
+  "definition_id": "OD-001",
+  "inherited_from": "STUDY5_EQ1",
+  "statement": "The registered ceiling is measured in actively used GPU-hours. VM wall-clock hours and allocated GPU-hours are reported separately and are not bound by that ceiling.",
+  "three_quantities_remain_separately_reported": true,
+  "no_quantity_may_substitute_for_another": true
+ },
+
+ "actively_used_gpu_hours": {
+  "definition": "GPU-seconds actually consumed by work this invocation performed, from the per-step gpu_seconds field of the journal, divided by 3600",
+  "bound_by_the_ceiling": true,
+  "this_phase": 0.106056,
+  "breakdown": {
+   "P0-000-PREREG": 0.0,
+   "P0-001-FRAME": 0.0,
+   "P0-002-PATCH": 0.106056,
+   "P0-003-MERGE-DECIDE": 0.0,
+   "P0-004-STOP": 0.0
+  },
+  "per_shard_wall_seconds": {"0": 101.2, "1": 92.3, "2": 91.8, "3": 96.5},
+  "gpu_seconds_total": 381.8,
+  "note": "each shard occupied exactly one physical A100 for its own wall time, so actively used GPU-seconds is the sum across shards rather than the maximum"
+ },
+
+ "cumulative": {
+  "before_this_phase": 39.065839,
+  "source": "sum of gpu_seconds over studies/study5/qualification-eq*/journal/*.jsonl divided by 3600",
+  "this_phase": 0.106056,
+  "after_this_phase": 39.171895,
+  "registered_total_ceiling": 240,
+  "remaining_against_total": 200.828105,
+  "jlens_route_additional_ceiling": 15,
+  "jlens_route_consumed": 0.106056,
+  "jlens_route_remaining": 14.893944,
+  "hard_stop_at_cumulative": 54.065839,
+  "hard_stop_reached": false
+ },
+
+ "vm_wall_clock_hours": {
+  "definition": "elapsed hours during which each VM was in the running power state",
+  "bound_by_the_ceiling": false,
+  "note": "accrues by operator decision; measured and reported, never used to argue for stopping anything",
+  "a100_vm_measurement_window_utc": ["2026-08-29T00:32:10Z", "2026-08-29T00:35:00Z"],
+  "a100_vm_hours_attributable_to_this_phase": 0.047,
+  "a100_vm_uptime_at_measurement": "2 days 15 hours 36 minutes, unchanged by this phase",
+  "cpuserver_hours_this_invocation": "running throughout; not used by this phase",
+  "training_group_v100_hours_this_invocation": "running throughout; not used, not reached, not configured"
+ },
+
+ "allocated_gpu_hours": {
+  "definition": "visible GPU count multiplied by the hours each GPU host was running",
+  "bound_by_the_ceiling": false,
+  "gpu_count_a100_vm": 4,
+  "gpu_count_training_group": 16,
+  "a100_vm_allocated_hours_during_the_measurement_window": 0.188,
+  "note": "all four A100s were occupied for the measurement, so allocated and actively used are close here; they are still reported separately because OD-001 forbids substituting one for the other"
+ },
+
+ "paid_resources": {
+  "a100_vm": {"safe_name": "a100-vm", "sku": "Standard_NC96ads_A100_v4", "power_state": "running", "reconfigured": false, "stopped_by_this_invocation": false},
+  "cpuserver": {"safe_name": "cpuserver", "sku": "Standard_D16ds_v5", "power_state": "running", "reconfigured": false, "stopped_by_this_invocation": false},
+  "training_group_v100": {
+   "count": 4,
+   "sku": "Standard_NC24s_v3",
+   "gpus_each": 4,
+   "power_state": "running",
+   "reconfigured": false,
+   "touched_by_this_invocation": false,
+   "nsg_rules_added_to_reach_them": 0,
+   "note": "these are required to remain running, remain idle and remain untouched; their correct role in this study is to stay unchanged, and they did"
+  }
+ },
+
+ "cost_reduction_actions_proposed": 0,
+ "cost_reduction_actions_performed": 0,
+ "vms_stopped_or_deallocated": 0,
+ "spend_interrupted_by_this_invocation": false,
+
+ "azure_mutations": {
+  "vms_created_or_deleted": 0,
+  "vms_resized": 0,
+  "vms_rebooted": 0,
+  "power_state_changes": 0,
+  "disks_or_nics_or_rbac_touched": 0,
+  "nsg_rules_added": 0,
+  "containers_created": 0,
+  "blobs_written": 0,
+  "existing_blobs_overwritten": 0,
+  "sas_tokens_used": 0,
+  "storage_account_keys_read": 0,
+  "read_only_operations_performed": ["az account show", "az vm list -d", "az vm show osProfile"]
+ },
+
+ "network": {
+  "measurement_containers_ran_with": "--network none",
+  "bytes_fetched_during_this_phase": 0,
+  "eq2_artifacts_mounted": "read-only"
+ },
+
+ "claim_ceiling": "A resource record. It licenses no claim of any kind."
+}

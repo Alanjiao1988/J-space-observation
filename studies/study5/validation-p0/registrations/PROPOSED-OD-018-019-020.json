@@ -1,0 +1,45 @@
+{
+ "schema_version": "study5-p0-proposed-rules-v1",
+ "status": "PROPOSED, NOT IN FORCE",
+ "recorded_at_utc": "2026-08-29T00:45:00Z",
+ "phase": "P-0",
+
+ "why_these_are_proposed_and_not_registered": "each one was suggested by an unfavourable result. Registering a rule now and then applying it to data already in hand would be the exact move the directionality precedent forbids. They are written down so the operator can adopt, reject or rewrite them BEFORE any successor measurement runs, which is the only ordering that makes them legitimate.",
+
+ "motivation_asymmetry_disclosure": {
+  "required_by": "authority section 8 clause 3",
+  "statement": "I would not have thought of OD-018 or OD-019 had the P-0 gates passed. Both were prompted by failures.",
+  "why_they_could_still_be_legitimate": "their legitimacy would come from being fixed before the successor measurement exists, so that their content cannot be tuned to a result. That decoupling has not happened yet, which is why their status is PROPOSED.",
+  "who_decides": "the operator, not the agent"
+ },
+
+ "OD-018_PROPOSED": {
+  "title": "a null must be demonstrated quiet before it may set a ceiling",
+  "statement": "A construction may serve as a zero-intervention null only if its own pooled effect is demonstrated to be within a registered tolerance of zero. A construction that is merely ARGUED to carry no information, but whose measured effect is of the same order as the effect under test, is not a null; it is a second signal, and using it as a ceiling converts a test into a formality.",
+  "what_it_would_have_caught_here": "the unrelated-donor null at BRIDGE reaches a worst pooled mean of 0.1305 and the norm-matched random null reaches 0.4139, against a real BRIDGE peak of 0.2380. Under this rule neither would have qualified as a null, and the defect would have surfaced before the decision rule was written rather than after it ran.",
+  "relationship_to_OD_011": "OD-011 asks whether a criterion can fail. OD-018 would ask whether the criterion can PASS on a true positive. They are the two halves of the same requirement and this study has only ever enforced the first.",
+  "relationship_to_the_EQ2_record": "EQ2 recorded that a null carrying a small real signal produced a band. That was written up as a lesson about the null's construction; OD-018 would make it a standing precondition instead of a lesson."
+ },
+
+ "OD-019_PROPOSED": {
+  "title": "an estimand must be shown to separate the movement it names from movements it does not",
+  "statement": "Where an estimand is a normalised contrast between two outcomes, it must be demonstrated, before use, that a perturbation which degrades one outcome without informing the other does not move the estimand. If it does, the estimand measures disruption as well as the quantity it names, and its magnitude cannot be attributed.",
+  "what_it_would_have_caught_here": "restoration is normalised on logit(donor target) minus logit(recipient target). Any patch that merely disrupts the recipient's own answer raises it while carrying no donor information at all. The demonstration would have failed immediately and cheaply, on synthetic data, before any GPU time was spent.",
+  "note_on_severity": "this is the heavier of the two. A mis-scaled ceiling makes a test conservative; an estimand that conflates two movements makes its magnitude uninterpretable in both directions."
+ },
+
+ "OD-020_PROPOSED": {
+  "title": "a baseline must be measured under the same execution conditions as the quantity it is subtracted from",
+  "statement": "Where a measurement is a difference between a baseline run and a treated run, both must be executed under identical batching, dtype and kernel-selection conditions. A baseline taken under different conditions imports a systematic offset that no downstream check can attribute.",
+  "what_it_would_have_caught_here": "the clean baseline was a batch-of-one forward and every treated value a batch-of-48 forward, which put a constant offset of about 0.0138 into every restoration value.",
+  "note": "the PREFIX integrity gate DID catch this, which is the one part of the design that worked as intended. OD-020 would move the catch earlier, to before the run."
+ },
+
+ "what_none_of_these_may_be_used_for": [
+  "they may not be applied retroactively to the P-0 measurement already in hand",
+  "they may not be used to re-decide the halted verdict",
+  "they change nothing about EQ1 or EQ2"
+ ],
+
+ "claim_ceiling": "Proposed governance text. It is not in force and it licenses no claim."
+}
