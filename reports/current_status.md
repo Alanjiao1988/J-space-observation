@@ -1,5 +1,12 @@
 # Project Status Report
 
+> [!CAUTION]
+> **This file is a preserved historical progress log and is not the current project state.**
+>
+> The project is terminally `DISCONTINUED — RESEARCH QUESTION UNANSWERED` as of 2026-08-29. Read [`../PROJECT_DISCONTINUATION.md`](../PROJECT_DISCONTINUATION.md), [`../REPORT.md`](../REPORT.md), and [`../studies/README.md`](../studies/README.md) before the chronology below. Any earlier “next action,” “awaiting,” or “authorized” language is superseded and grants no present execution authority.
+
+## Preserved historical chronology
+
 > **STUDY 3 P0-R1 IS EXECUTION READY - AWAITING ITS REPLAY GATE**
 >
 > States: `STUDY3_INTERFACE_CALIBRATION_PROTOCOL_DRAFT_V0_6_COMPLETE_AWAITING_FINAL_FOCUSED_METHODS_REVIEW`
